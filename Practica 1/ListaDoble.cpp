@@ -69,7 +69,7 @@ void ListaDoble::InsertarAfterAt(Nodo* n, char dato){
 ***************************************************************************/
 void ListaDoble::Eliminar(Nodo* n){
     if (!Verificar() || n != NULL)
-    {   
+    {
         if (n == First && n == Last)
         {
             //ELIMINA EL ULTIMO NODO: LISTA VACIA
@@ -143,22 +143,18 @@ Nodo* ListaDoble::Buscar(int index){
     return encontrado;
 }
 //Metodo publico para buscar un nodo SEGUN: el primer caracter de una cadena
-Nodo* ListaDoble::Buscar(string s){    
+Nodo* ListaDoble::Buscar(string s){
     Nodo* aux = First;
     Nodo* encontrado = NULL;
     char a = s[0];
-    int b = s.length(), pos=0;
-    cout<<s[0];
-    cout<<s[b-1];
     while (aux !=NULL)
     {
-        if (aux->dato == a && aux->Anterior->dato == ' ' && (Buscar(pos + b - 1)->dato == s[b-1]))
+        if (aux->dato == a)
         {
             encontrado = aux;
             aux=NULL;
         }else{
             aux = aux->Siguiente;
-            pos++;
         }        
     }
     return encontrado;
@@ -170,6 +166,10 @@ Nodo* ListaDoble::ObtenerFirst(){
 //Metodo publico para buscar un nodo SEGUN: el ultimo siempre
 Nodo* ListaDoble::ObtenerLast(){
     return Last;
+}
+//Metodo publico para obtener index de un nodo buscado por contenido
+int ListaDoble::ObtenerIndex(){
+    return 0;
 }
 /***********************************************************************
     METODOS PARA LA COMPROBACION DE DATOS Y DESPLIEGE EN PANTALLA
@@ -195,13 +195,27 @@ int ListaDoble::Size(){
     }
     return contador;    
 }
-//Imprime todo el contenido de la lista
+//Vacia la lista para volverse a iniciar
+void ListaDoble::Vaciar(){
+    First= NULL;
+    Last = NULL;
+}
+/*Imprime todo el contenido de la lista
 void ListaDoble::Imprimir(){
     Nodo* aux= First;
     while (aux != NULL)
     {
         cout<<aux->dato;
         aux=aux->Siguiente;
-    }
-    
+    }    
 }
+//Enlista los caracteres de la lista
+void ListaDoble::Enlistar(){
+    Nodo* aux= First;
+    cout<<endl<<endl<<"Listado:"<<endl;
+    while (aux != NULL)
+    {       
+        cout<<aux->dato;
+        aux=aux->Siguiente;        
+    }
+}*/

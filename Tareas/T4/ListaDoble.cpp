@@ -137,13 +137,16 @@ Nodo* ListaDoble::Buscar(int index){
     return encontrado;
 }
 //Metodo publico para buscar un nodo SEGUN: el primer caracter de una cadena
-Nodo* ListaDoble::Buscar(string s){
+Nodo* ListaDoble::Buscar(string s){    
     Nodo* aux = First;
     Nodo* encontrado = NULL;
     char a = s[0];
+    int b = s.length();
+    cout<<s[0];
+    cout<<s[b-1];
     while (aux !=NULL)
     {
-        if (aux->dato == a)
+        if (aux->dato == a && aux->Anterior->dato == ' ' && (Buscar(b-1)->dato == s[b-1]))
         {
             encontrado = aux;
             aux=NULL;
