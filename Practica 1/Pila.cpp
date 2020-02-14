@@ -37,3 +37,19 @@ bool Pila::Vacio(){
 void Pila::Vaciar(){
     Header = NULL;
 }
+
+NodoPila* Pila::ObtenerHeader(){
+    return Header;
+}
+
+int Pila::Size(){
+    int contadorIndex=0;
+    NodoPila* aux= Header;
+    while (aux != NULL)
+    {
+        contadorIndex++;
+        aux=aux->Siguiente;
+    }
+    return contadorIndex;
+    
+}

@@ -1,0 +1,6 @@
+digraph L {
+  node [shape=record fontname=Arial];
+  rankdir=LR;
+0 [label="Archivo 1 \lArchivosRecientesReport.dot \l"]
+
+}

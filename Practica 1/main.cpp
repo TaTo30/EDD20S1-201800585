@@ -248,9 +248,83 @@ void ModoEditorTexto(){
 			case CTRLR:
 				if (true)
 				{
+					char a;
 					int X=PosicionCursorX(), Y=PosicionCursorY();
-					gotoxy(5,1);cout<<"[Reportes]: 1. Lista, 2. Palabras Buscadas, 3. Palabras Ordenadas";
-					gotoxy(X,Y);
+					gotoxy(5,1);cout<<"[Reportes]: 1. Lista, 2. Palabras Buscadas, 3. Palabras Revertidas :>> ";cin>>a;
+					if (a == '1')
+					{
+						Nodo* aux= listaCaracteres->ObtenerFirst();
+						saveFile.open("ListaReport.dot");
+						saveFile<<"digraph L {"<<endl;
+						saveFile<<"  node [shape=record fontname=Arial];"<<endl;
+						for (int i = 0; i < listaCaracteres->Size(); i++)
+						{
+							saveFile<<i<<" [label=\""<<aux->dato<<"\"]"<<endl;
+							aux = aux->Siguiente;			
+						}
+						saveFile<<"0";
+						for (int i = 1; i < listaCaracteres->Size(); i++)
+						{
+							saveFile<<" -> "<<i;
+						}						
+						saveFile<<endl<<listaCaracteres->Size()-1;
+						for (int i = 2; i < listaCaracteres->Size()+1; i++)
+						{
+							saveFile<<" -> "<<listaCaracteres->Size() - i;
+						}
+						
+						saveFile<<"\n }";
+						saveFile.close();
+						system("dot -Tpng ListaReport.dot -o ListaReport.png");
+						system("ListaReport.png");
+					}else if(a == '2'){
+						NodoPila* aux= logCambios->ObtenerHeader();
+						saveFile.open("PilaCambios.dot");
+						saveFile<<"digraph L {"<<endl;
+						saveFile<<"  node [shape=record fontname=Arial];"<<endl;
+						for (int i = 0; i < logCambios->Size(); i++)
+						{
+							saveFile<<i<<" [label=\"De: "<<aux->buscar<<"\\lA: "<<aux->reemplazar<<"\"]"<<endl;	
+							aux=aux->Siguiente;		
+						}
+						saveFile<<"0";
+						for (int i = 1; i < logCambios->Size(); i++)
+						{
+							saveFile<<" -> "<<i;
+						}
+						saveFile<<"\n }";
+						saveFile.close();
+						system("dot -Tpng PilaCambios.dot -o PilaCambios.png");
+						system("PilaCambios.png");
+					}else{
+						NodoPila* aux= logRevertidos->ObtenerHeader();
+						saveFile.open("PilaRevertidos.dot");
+						saveFile<<"digraph L {"<<endl;
+						saveFile<<"  node [shape=record fontname=Arial];"<<endl;
+						for (int i = 0; i < logRevertidos->Size(); i++)
+						{
+							saveFile<<i<<" [label=\"De: "<<aux->buscar<<"\\lA: "<<aux->reemplazar<<"\"]"<<endl;	
+							aux=aux->Siguiente;		
+						}
+						saveFile<<"0";
+						for (int i = 1; i < logRevertidos->Size(); i++)
+						{
+							saveFile<<" -> "<<i;
+						}
+						saveFile<<"\n }";
+						saveFile.close();
+						system("dot -Tpng PilaRevertidos.dot -o PilaRevertidos.png");
+						system("PilaRevertidos.png");
+					}
+					gotoxy(5,1);cout<<"                                                                    ";
+					gotoxy(5,1);cout<<"Reportes Generados";					
+					std::cin.get();
+					std::cin.ignore();
+					system("cls");
+					PintarMarco();
+					ControlesEditorTexto();
+					ImprimirLista();
+					gotoxy(X, Y);	
 				}
 				
 			break;
@@ -442,7 +516,29 @@ void ModoArchivosRecientes(){
 		PintarMarco();
 		MenuInicio();
 	}else{
-		/*Reporte*/
+		aux=archivosRecientes->ObtenerFirst();
+		saveFile.open("ArchivosRecientesReport.dot");
+		saveFile<<"digraph L {"<<endl;
+		saveFile<<"  node [shape=record fontname=Arial];"<<endl;
+		saveFile<<"  rankdir=LR;"<<endl;
+		for (int i = 0; i < archivosRecientes->Size(); i++)
+		{
+			saveFile<<i<<" [label=\"Archivo "<<i+1<<" \\l"<<aux->dato<<" \\l\"]"<<endl;
+			aux=aux->Siguiente;			
+		}
+		saveFile<<"0";
+		for (int i = 1; i < archivosRecientes->Size(); i++)
+		{
+			saveFile<<" -> "<<i;
+		}
+		saveFile<<" -> 0"<<"\n }";
+		saveFile.close();
+		system("dot -Tpng ArchivosRecientesReport.dot -o ArchivosRecientesReport.png");
+		gotoxy(5,1);cout<<"									";gotoxy(5,1);cout<<"Reporte Generado";		
+		system("ArchivosRecientesReport.png");
+		cin.get();
+		cin.ignore();
+		MenuInicio();
 	}
 	
 }
