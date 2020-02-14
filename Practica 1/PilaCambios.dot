@@ -1,0 +1,6 @@
+digraph L {
+  node [shape=record fontname=Arial];
+0 [label="De: guatemala\lA: Guatemala"]
+1 [label="De: san\lA: San"]
+0 -> 1
+ }

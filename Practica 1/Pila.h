@@ -13,6 +13,8 @@ public:
     NodoPila* Pop();
     bool Vacio();
     void Vaciar();
+    NodoPila* ObtenerHeader();
+    int Size();
     Pila();
 };
 
