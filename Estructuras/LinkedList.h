@@ -1,17 +1,25 @@
-#include "ListaDoble.h"
+#include <iostream>
+#include <stdio.h>
 
-ListaDoble::ListaDoble(){
-    First = NULL;
-    Last = NULL;
-}
+using namespace std;
 
-/*************************************************************************
-    METODOS PARA LA INSERSION DE DATOS EN LA LISTA DOBLEMENTE ENLAZADA
-*************************************************************************/
-//Metodo privado general para insertar datos
-void ListaDoble::Insertar(Nodo* n, char dato_, bool pos){
-    Nodo* aux = new Nodo();
-    aux->dato = dato_;
+
+
+template <typename T> class LinkedList
+{   
+    template <typename T> struct Nodo
+    {   
+        T dato;
+        Nodo* Anterior;
+        Nodo* Siguiente;        
+    };
+private:   
+    Nodo<T>* First;
+    Nodo<T>* Last;
+    //Metodo privado general para insertar datos
+void Add(Nodo<T>* n, T dato_, bool pos){
+    Nodo<T>* aux = new Nodo<T>();
+    aux->dato = dato_;    
     if (Verificar() && n == NULL)
     {
         cout<<"Error: esta intentado agregar un Nodo vacio, verifique la lista"<<endl;
@@ -46,28 +54,38 @@ void ListaDoble::Insertar(Nodo* n, char dato_, bool pos){
         }  
     }
 }
+
+public:  
+
+LinkedList(){
+    First = NULL;
+    Last = NULL;
+}
+/*************************************************************************
+    METODOS PARA LA INSERSION DE DATOS EN LA LISTA DOBLEMENTE ENLAZADA
+*************************************************************************/
 //Metodo publico para insertar al inicio de la lista
-void ListaDoble::InsertarFirst(char dato){
-    Insertar(First, dato, true);
+void AddFirst(T dato){
+    Add(First, dato, true);
 }
 //Metodo publico para insertar al final de la lista
-void ListaDoble::InsertarLast(char dato){
-    Insertar(Last, dato, false);
+void AddLast(T dato){
+    Add(Last, dato, false);
 }
 //Metodo publico para insertar antes de un nodo dado (el nodo se obtiene con los metodos de buscar)
-void ListaDoble::InsertarBeforeAt(Nodo* n, char dato){
-    Insertar(n,dato, true);
+void AddBeforeAt(Nodo<T>* n, T dato){
+    Add(n,dato, true);
 }
 //Metodo publico para insertar despues de un nodo dado (el nodo se obtiene con los metodos de buscar)
-void ListaDoble::InsertarAfterAt(Nodo* n, char dato){
-    Insertar(n, dato, false);
+void AddAfterAt(Nodo<T>* n, T dato){
+    Add(n, dato, false);
 }
 
 
 /***************************************************************************
     METODOS PARA LA ELIMINACION DE DATOS EN LA LISTA DOBLEMENTE ENLAZADA
 ***************************************************************************/
-void ListaDoble::Eliminar(Nodo* n){
+void Remove(Nodo<T>* n){
     if (!Verificar() || n != NULL)
     {   
         if (n == First && n == Last)
@@ -98,15 +116,18 @@ void ListaDoble::Eliminar(Nodo* n){
         cout<<"Error: el nodo no se encuentra en la lista"<<endl;
     }    
 }
-
+//Metodo para eliminar uno nodo segun su posicion
+void RemoveAt(int index){
+    Remove(Index(index));
+}
 /***********************************************************************
     METODOS PARA LA BUSCAR DE DATOS EN LA LISTA DOBLEMENTE ENLAZADA
             TODOS LOS METODOS DE BUSCAR DEVUELVEN UN NODO
 ***********************************************************************/
 //Metodo publico para buscar un nodo SEGUN: su contenido
-Nodo* ListaDoble::Buscar(char dato){
-    Nodo* aux = First;
-    Nodo* encontrado=NULL;
+Nodo<T>* Find(T dato){
+    Nodo<T>* aux = First;
+    Nodo<T>* encontrado=NULL;
     while (aux != NULL)
     {
         if (aux->dato == dato)
@@ -120,9 +141,9 @@ Nodo* ListaDoble::Buscar(char dato){
     return encontrado;    
 }
 //Metodo publico para buscar un nodo SEGUN: su posicion
-Nodo* ListaDoble::Buscar(int index){
-    Nodo* aux = First;
-    Nodo* encontrado = NULL;
+Nodo<T>* Index(int index){
+    Nodo<T>* aux = First;
+    Nodo<T>* encontrado = NULL;
     int contadorIndex = 0;
     if (index > Size())
     {
@@ -142,40 +163,19 @@ Nodo* ListaDoble::Buscar(int index){
     }    
     return encontrado;
 }
-//Metodo publico para buscar un nodo SEGUN: el primer caracter de una cadena
-Nodo* ListaDoble::Buscar(string s){    
-    Nodo* aux = First;
-    Nodo* encontrado = NULL;
-    char a = s[0];
-    int b = s.length(), pos=0;
-    cout<<s[0];
-    cout<<s[b-1];
-    while (aux !=NULL)
-    {
-        if (aux->dato == a && aux->Anterior->dato == ' ' && (Buscar(pos + b - 1)->dato == s[b-1]))
-        {
-            encontrado = aux;
-            aux=NULL;
-        }else{
-            aux = aux->Siguiente;
-            pos++;
-        }        
-    }
-    return encontrado;
-}
 //Metodo publico para buscar un nodo SEGUN: el primero siempre
-Nodo* ListaDoble::ObtenerFirst(){
+Nodo<T>* GetFirst(){
     return First;
 }
 //Metodo publico para buscar un nodo SEGUN: el ultimo siempre
-Nodo* ListaDoble::ObtenerLast(){
+Nodo<T>* GetLast(){
     return Last;
 }
 /***********************************************************************
     METODOS PARA LA COMPROBACION DE DATOS Y DESPLIEGE EN PANTALLA
 ***********************************************************************/
 //Verifica que la lista este vacia
-bool ListaDoble::Verificar(){
+bool Verificar(){
     if (First == NULL)
     {
         return false;
@@ -185,8 +185,8 @@ bool ListaDoble::Verificar(){
     
 }
 //Verifica el tamanio de la lista
-int ListaDoble::Size(){
-    Nodo* aux = First;
+int Size(){
+    Nodo<T>* aux = First;
     int contador=0;
     while (aux != NULL)
     {
@@ -196,12 +196,12 @@ int ListaDoble::Size(){
     return contador;    
 }
 //Imprime todo el contenido de la lista
-void ListaDoble::Imprimir(){
-    Nodo* aux= First;
+void Imprimir(){
+    Nodo<T>* aux= First;
     while (aux != NULL)
     {
         cout<<aux->dato;
         aux=aux->Siguiente;
-    }
-    
+    }    
 }
+};

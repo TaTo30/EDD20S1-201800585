@@ -1,8 +1,6 @@
 digraph L {
   node [shape=record fontname=Arial];
   rankdir=LR;
-0 [label="Archivo 1 \lprueba4.txt \l"]
-1 [label="Archivo 2 \lprueba2.txt \l"]
-2 [label="Archivo 3 \lprueba.txt \l"]
-0 -> 1 -> 2 -> 0
+0 [label="Archivo 1 \lprueba2.txt \l"]
+0 -> 0
  }
