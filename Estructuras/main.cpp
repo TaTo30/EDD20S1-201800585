@@ -5,6 +5,7 @@
 #include "BinaryTree.h"
 #include <stdio.h>
 #include <string.h>
+#include "Matrix.h"
 
 using namespace std;
 
@@ -77,6 +78,14 @@ int main()
 
     jugadores.Remove((int)'C');
     */
+   Matrix<string> matriz;
+   matriz.Add("A",0,0);
+   matriz.Add("B",1,4);
+   matriz.Add("C",5,0);
+   matriz.RemoveAt(0);
+   matriz.Remove(matriz.Find("B"));
+   cout<<matriz.Size()<<'\n';
+
     
 
 
