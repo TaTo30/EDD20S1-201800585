@@ -1,0 +1,10 @@
+digraph g { rankdir=LR; node [shape=box];
+hola->mundo
+hola->diccionario
+mundo->proyecto
+mundo->hola
+proyecto->diccionario
+proyecto->mundo
+diccionario->hola
+diccionario->proyecto
+}
