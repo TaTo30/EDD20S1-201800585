@@ -204,4 +204,9 @@ void Imprimir(){
         aux=aux->Siguiente;
     }    
 }
+//Elimina todo el contenido de la lista
+void Clear(){
+    First = NULL;
+    Last = NULL;
+}
 };

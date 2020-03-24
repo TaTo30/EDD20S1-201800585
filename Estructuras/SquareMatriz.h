@@ -6,35 +6,67 @@ template <typename T> class Matrix
 {
     template <typename T> struct Nodo
     {
-        T* Dato;
+        T Dato;
         int X, Y;
-        Nodo* Siguiente;
+        Nodo* Siguiente, Anterior, Arriba, Abajo;
     };
 private:
-    Nodo<T>* First;
-    Nodo<T>* Last;
+    Nodo<T>* FirstX;
+    Nodo<T>* LastX;
+    Nodo<T>* FirstY;
+    Nodo<T>* LastY;
 public:
 Matrix(){
-    First = NULL;
-    Last = NULL;
+    FirstX = NULL;
+    LastX = NULL;
+    FirstY = NULL;
+    LastY = NULL;
 }
 
-void Add(T* Value, int X, int Y){
+void Add(T Value, int X, int Y){
     Nodo<T>* aux = new Nodo<T>();
     aux->Dato = Value;
     aux->X = X;
     aux->Y = Y;
-    if (First == NULL)
+    if (FirstX == NULL)
     {
        //LISTA VACIA
-       First = aux;
-       Last = aux;
+       FirstX = aux;
+       LastX = aux;
+       FirstY = aux;
+       LastY = aux;
     }
     else
     {
-        //INSERTAR SIEMPRE AL FINAL
-       Last->Siguiente = aux;
-       Last = aux;
+        //PARA X
+        if (X < FirstX->X)
+        {
+            FirstX->Anterior = aux;
+            aux->Siguiente = FirstX;
+            FirstX = aux;
+        }else if (X > LastX->X)
+        {
+            LastX->Siguiente = aux;
+            aux->Anterior = LastX;
+            LastX = aux;
+        }else{
+            Nodo<T>* busqueda = First;
+            while (busqueda != NULL)
+            {
+                if ((OrderIndex > busqueda->orderIndex) && (OrderIndex <= busqueda->siguiente->orderIndex) )
+                {
+                    aux->siguiente = busqueda->siguiente;
+                    busqueda->siguiente = aux;
+                    busqueda = NULL;
+                
+                }else{
+                    busqueda = busqueda->siguiente;
+                }            
+            } 
+        }
+        
+        
+        
     }     
 }
 
@@ -112,7 +144,7 @@ int Size(){
             TODOS LOS METODOS DE BUSCAR DEVUELVEN UN NODO
 ***********************************************************************/
 //Metodo publico para buscar un nodo SEGUN: Su contenido
-Nodo<T>* Find(T* dato){
+Nodo<T>* Find(T dato){
     Nodo<T>* aux = First;
     Nodo<T>* encontrado=NULL;
     while (aux != NULL)
@@ -148,22 +180,6 @@ Nodo<T>* Index(int index){
             }        
         }
     }    
-    return encontrado;
-}
-//METODO QUE DEVUELVE SI UNA POSICION ESTA OCUPADA
-bool Position(int x, int y){
-    Nodo<T>* aux = First;
-    bool encontrado = false;
-    while (aux != NULL)
-    {
-        if (aux->X == x && aux->Y == y)
-        {
-            encontrado = true;
-            aux=NULL;
-        }else{
-            aux=aux->Siguiente;
-        }        
-    }
     return encontrado;
 }
 };
