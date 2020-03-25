@@ -23,14 +23,17 @@ using json = nlohmann::json;
 
 //VARIABLES QUE SE DEFINEN CON ARCHIVO DE CONFIGUARCION
 LinkedList<string>* Diccionario = new LinkedList<string>();
-LinkedListP<Ficha>* PalabraTemporal = new LinkedListP<Ficha>();
+Matrix<Ficha>* PalabraTemporal = new Matrix<Ficha>();
 Matrix<Ficha>* CasillasDobles = new Matrix<Ficha>();
 Matrix<Ficha>* CasillasTriples = new Matrix<Ficha>();  
 Matrix<Ficha>* Tablero = new Matrix<Ficha>();
 BinaryTree<Jugador>* Jugadores = new BinaryTree<Jugador>();
 LinkedListP<Jugador>* ListaJugadores = new LinkedListP<Jugador>();
+OrderList<string>* MejoresPunteos = new OrderList<string>();
 Jugador* Player1;
 Jugador* Player2;
+int PuntosP1=0;
+int PuntosP2=0;
 //VARIABLES YA DEFINIDAS DEL JUEGO
 Queue<Ficha>* Fichas = new Queue<Ficha>();
 int Dimension=0;
@@ -53,8 +56,80 @@ void MenuSelectP2();
 void Turno(Jugador* P);
 void ModoSeleccion(Jugador* P);
 void ImprimirTablero();
+void ModoScoreBoard();
 
 //DESARROLLO DE METODOS
+void ModoScoreBoard(){
+    int n;
+    Gotoxy(5,2);cout<<"SCOREBOARD";
+    Gotoxy(7,3);cout<<"*Seleccione al Jugador 1";
+    Gotoxy(7,5);cout<<"0> Mejores Punteos";
+    for (int i = 0; i < ListaJugadores->Size(); i++)
+    {
+        Gotoxy(7,6+i);cout<<i+1<<"> "<<ListaJugadores->Index(i)->dato->GetNombre();
+    }
+    Gotoxy(7,6+ListaJugadores->Size());cout<<"SELECT> ";cin>>n;
+    if (n >= 0 && n < ListaJugadores->Size()+1)
+    {
+        if (n == 0)
+        {
+            string graph = "digraph G {rankdir = LR; Node [shape=\"box\"];\n";
+            //CREAR NODOS
+            for (int i = 0; i < MejoresPunteos->Size(); i++)
+            {
+                graph += "N"+to_string(i)+" [label = \""+MejoresPunteos->Index(i)->dato+", "+to_string(MejoresPunteos->Index(i)->orderIndex)+"\"];\n";
+            }
+            //LINKEAR NODOS
+            for (int i = 0; i < MejoresPunteos->Size(); i++)
+            {
+                if (MejoresPunteos->Index(i)!=MejoresPunteos->Max())
+                {
+                    graph += "N"+to_string(i)+" -> N"+to_string(i+1)+";\n";
+                }                
+            }
+            graph +="}";
+            ofstream file;
+            file.open("Dot\\MejoresPlayers.dot");
+            file<<graph;
+            file.close();
+            system("dot -Tpng Dot\\MejoresPlayers.dot -o PNG\\MejoresPlayers.png");
+            system("PNG\\MejoresPlayers.png");
+            system("cls");
+            PintarMarco();
+            ModoScoreBoard(); 
+            
+        }else{
+            Jugador* temp = ListaJugadores->Index(n-1)->dato;
+            string graph = "digraph G {rankdir = LR; Node [shape=\"box\"];\n";
+            OrderList<int>* listaTemp = temp->GetPuntajesPlayer();
+            graph += listaTemp->Index(0)->dato+";\n";
+            for (int i = 0; i < listaTemp->Size(); i++)
+            {
+                if (listaTemp->Index(i)!=listaTemp->Max())
+                {
+                    graph += listaTemp->Index(i)->dato +"->"+to_string(listaTemp->Index(i+1)->dato)+";\n";
+                }                
+            }
+            graph +="}";
+            ofstream file;
+            file.open("Dot\\Player.dot");
+            file<<graph;
+            file.close();
+            system("dot -Tpng Dot\\Player.dot -o PNG\\Player.png");
+            system("PNG\\Player.png");
+            system("cls");
+            PintarMarco();
+            ModoScoreBoard();               
+        }
+        
+    }else{
+        Gotoxy(7,7+ListaJugadores->Size());cout<<"Seleccion no Valida";
+        system("cls");
+        PintarMarco();
+        ModoScoreBoard();
+    }
+}
+
 void ImprimirTablero(){
     string graph = "digraph G { node [shape = box]; MT [label=\"Tablero\"];";
     //INSERTAMOS TODAS LAS X
@@ -221,19 +296,128 @@ void Turno(Jugador* P){
     Gotoxy(5,14);cout<<"PALABRA A FORMAR: ";
     for (int i = 0; i < PalabraTemporal->Size(); i++)
     {
-        cout<<PalabraTemporal->Index(i)->dato->GetLetra();
+        cout<<PalabraTemporal->Index(i)->Dato->GetLetra();
     }
     
     char a;
-    Gotoxy(5,16);cout<<"Pulse ENTER para validar su Turno o ESC para Cancelar la partida";
+    Gotoxy(5,16);cout<<"Pulse V para validar su Turno o E para Terminar la partida";
     Gotoxy(5,15);cout<<"SELECCIONAR FICHA> ";cin>>a;
-    if (a == ENTER)
+    if (a == 'V')
     {
-        //validar turno
-    }else if (a == ESC)
+        string palabraFormada="";
+        bool Valido=false;
+        for (int i = 0; i < PalabraTemporal->Size(); i++)
+        {
+            palabraFormada += PalabraTemporal->Index(i)->Dato->GetLetra();
+        }
+        for (int i = 0; i < Diccionario->Size(); i++)
+        {
+            if (Diccionario->Index(i)->dato == palabraFormada)
+            {
+                Valido = true;
+            }
+        }
+        //SI ES VALIDO SUMAR LOS PUNTOS AGREGARLOS AL PUNTEO
+        //-VACIAR LA LISTA TEMPORAL
+        //INICIAR EL NUEVO TURNO
+        if (Valido)
+        {
+            Gotoxy(5,18);cout<<"Tu Palabra es Valida";
+            for (int i = 0; i < PalabraTemporal->Size(); i++)
+            {
+                if (CasillasTriples->Position(PalabraTemporal->Index(i)->X,PalabraTemporal->Index(i)->Y))
+                {
+                    //SI ESTA FICHA ESTA EN UNA POSICION TRIPLE ENTONCES SE MULTIPLICA
+                    if (P == Player1)
+                    {
+                        PuntosP1 += 3*(PalabraTemporal->Index(i)->Dato->GetPuntaje());
+                    }else{
+                        PuntosP2 += 3*(PalabraTemporal->Index(i)->Dato->GetPuntaje());
+                    }
+                }else if (CasillasDobles->Position(PalabraTemporal->Index(i)->X,PalabraTemporal->Index(i)->Y))
+                {
+                    //SI ESTA FICHA ESTA EN UNA POSICION DOBLE
+                    if (P == Player1)
+                    {
+                        PuntosP1 += 2*(PalabraTemporal->Index(i)->Dato->GetPuntaje());
+                    }else{
+                        PuntosP2 += 2*(PalabraTemporal->Index(i)->Dato->GetPuntaje());
+                    }
+                }else{
+                    if (P == Player1)
+                    {
+                        PuntosP1 += (PalabraTemporal->Index(i)->Dato->GetPuntaje());
+                    }else{
+                        PuntosP2 += (PalabraTemporal->Index(i)->Dato->GetPuntaje());
+                    }
+                }
+            }
+            char tecla =' ';
+            while (tecla != ENTER)
+            {
+                if (kbhit())
+                {
+                    tecla = getch();
+                }       
+            }
+            system("cls");
+            PintarMarco();
+            if (P == Player1)
+            {
+                PalabraTemporal->Clear();
+                Turno(Player2);
+            }else{
+                PalabraTemporal->Clear();
+                Turno(Player1);
+            }
+        }
+        else
+        {
+            //SI NO ES VALIDO DEVOLVER FICHAS A LA COLA
+            //ELIMINAR DEL TABLERO
+            //-VACIAR LA LISTA
+            //INICIAR EL NUEVO TURNO
+            Gotoxy(5,18);cout<<"Tu Palabra no es Valida";
+            for (int i = 0; i < PalabraTemporal->Size(); i++)
+            {
+                Fichas->Enqueue(PalabraTemporal->Index(i)->Dato);
+                Tablero->Remove(Tablero->Find(PalabraTemporal->Index(i)->Dato));
+            }
+            char tecla =' ';
+            while (tecla != ENTER)
+            {
+                if (kbhit())
+                {
+                    tecla = getch();
+                }       
+            }
+            system("cls");
+            PintarMarco();
+            if (P == Player1)
+            {
+                PalabraTemporal->Clear();
+                Turno(Player2);
+            }else{
+                PalabraTemporal->Clear();
+                Turno(Player1);
+            }
+        }
+    }
+    else if (a == 'E')
     {
+        Player1->GetFichasPlayer()->Clear();
+        Player1->GetPuntajesPlayer()->Add(PuntosP1,PuntosP1);
+        MejoresPunteos->Add(Player1->GetNombre(),PuntosP1);
+        PuntosP1=0;
+        Player2->GetFichasPlayer()->Clear();
+        Player2->GetPuntajesPlayer()->Add(PuntosP2,PuntosP2);
+        MejoresPunteos->Add(Player2->GetNombre(),PuntosP2);
+        PuntosP2=0;
+        system("cls");
         MenuPrincipal();
-    }else{
+    }
+    else
+    {
         char b;
         Gotoxy(5,16);cout<<"<1> Agregar Esta Ficha a la Palabra  <2> Intercambiar esta Ficha con la Cola";
         Gotoxy(5,17);cout<<"SELECT> ";cin>>b;
@@ -246,14 +430,14 @@ void Turno(Jugador* P){
             if (!Tablero->Position(posx,posy))
             {
                 //SI LA POSICION NO ESTA OPCUPADA
-                if (!PalabraTemporal->Verificar())
+                if (!PalabraTemporal->Contain())
                 {
                     //SI LA LISTA NO TIENE DATOS
                     POSX = posx;
                     POSY = posy;
                     //AÑADIMOS LA FICHA AL TABLERO
                     Tablero->Add(P->GetFichasPlayer()->Index((int)a-48)->dato,POSX,POSY);
-                    PalabraTemporal->AddLast(P->GetFichasPlayer()->Index((int)a-48)->dato);
+                    PalabraTemporal->Add(P->GetFichasPlayer()->Index((int)a-48)->dato,POSX,POSY);
                     P->GetFichasPlayer()->RemoveAt((int)a-48);
                     P->GetFichasPlayer()->AddLast(Fichas->Dequeue()->dato);
                     ImprimirTablero();
@@ -278,7 +462,7 @@ void Turno(Jugador* P){
                         POSX = posx;
                         POSY = posy;
                         Tablero->Add(P->GetFichasPlayer()->Index((int)a-48)->dato,POSX,POSY);
-                        PalabraTemporal->AddLast(P->GetFichasPlayer()->Index((int)a-48)->dato);
+                        PalabraTemporal->Add(P->GetFichasPlayer()->Index((int)a-48)->dato,POSX,POSY);
                         P->GetFichasPlayer()->RemoveAt((int)a-48);
                         P->GetFichasPlayer()->AddLast(Fichas->Dequeue()->dato);
                         ImprimirTablero();
@@ -339,7 +523,6 @@ void Turno(Jugador* P){
         }
     } 
 }
-
 
 void EstablecerColaFichas(){
     int c;
@@ -658,7 +841,7 @@ void MenuReportes(){
     }
     else if (a == '7')
     {
-        /* code */
+        ImprimirTablero();
     }
 }
 
@@ -811,7 +994,9 @@ void MenuPrincipal(){
 	}
     else if(a == '5')
     {
-        
+        system("cls");
+        PintarMarco();
+        ModoScoreBoard();  
     }
     else if(a == '6')
     {
@@ -889,8 +1074,8 @@ void ModoAbrirArchivoJson(){
         CasillasDobles->Add(aux,temp["x"],temp["y"]);        
     }  
 
-    Gotoxy(5,18);cout<<"Terminada la lectura de archivo...";
-    Gotoxy(5,19);cout<<"Pulse ENTER para regresar al menu anterior";
+    Gotoxy(5,20);cout<<"Terminada la lectura de archivo...";
+    Gotoxy(5,21);cout<<"Pulse ENTER para regresar al menu anterior";
     char tecla =' ';
     while (tecla != ENTER)
     {

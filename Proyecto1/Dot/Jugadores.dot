@@ -1,8 +1,6 @@
 digraph g{ node [shape = circle];Heidy;
-Heidy->Carlos;
-Heidy->Rodrigo;
-Carlos->Antonio;
-Carlos->Eduardo;
-Rodrigo->Ivanka;
-Rodrigo->Tato30;
+Heidy->Antonio;
+Heidy->Pegre;
+Antonio->Darken;
+Pegre->TaTo30;
 }

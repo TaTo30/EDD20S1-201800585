@@ -166,4 +166,9 @@ bool Position(int x, int y){
     }
     return encontrado;
 }
+
+void Clear(){
+    First = NULL;
+    Last = NULL;
+}
 };
