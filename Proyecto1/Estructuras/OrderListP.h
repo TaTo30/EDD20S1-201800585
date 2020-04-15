@@ -1,42 +1,65 @@
 #include <stdio.h>
+#include <iostream>
 
 using namespace std;
 
-template <typename T> class Matrix
+template <typename T> class OrderListP
 {
     template <typename T> struct Nodo
     {
-        T* Dato;
-        int X, Y;
-        Nodo* Siguiente;
+        T* dato;
+        int orderIndex;
+        Nodo* siguiente;        
     };
+
 private:
     Nodo<T>* First;
     Nodo<T>* Last;
+
 public:
-Matrix(){
+OrderListP(){
     First = NULL;
     Last = NULL;
 }
 
-void Add(T* Value, int X, int Y){
+void Add(T* dato_, int OrderIndex){
     Nodo<T>* aux = new Nodo<T>();
-    aux->Dato = Value;
-    aux->X = X;
-    aux->Y = Y;
+    aux->dato = dato_;
+    aux->orderIndex = OrderIndex;
     if (First == NULL)
     {
-       //LISTA VACIA
-       First = aux;
-       Last = aux;
+        //SI LA LISTA ESTA VACIA: SE AÑADE E INICA LA LISTA
+        First = aux;
+        Last = aux;
     }
-    else
+    else if (OrderIndex < First->orderIndex)
     {
-        //INSERTAR SIEMPRE AL FINAL
-       Last->Siguiente = aux;
-       Last = aux;
-    }     
+        //SI EL DATO ES MENOR QUE EL PRIMERO SE INSERTA DE PRIMERO
+        aux->siguiente = First;
+        First = aux;
+    }else if (OrderIndex > Last->orderIndex)
+    {
+        //SI EL DATO ES MAYOR QUE EL ULTIMO SE INSERTA DE ULTIMO
+        Last->siguiente = aux;
+        Last = aux;
+    }else{
+        //SE BUSCA INSERTAR DONDE SEA MAYOR QUE UNO Y MENOR O IGUAL AL QUE SIGUE
+        Nodo<T>* busqueda = First;
+        while (busqueda != NULL)
+        {
+            if ((OrderIndex > busqueda->orderIndex) && (OrderIndex <= busqueda->siguiente->orderIndex) )
+            {
+                aux->siguiente = busqueda->siguiente;
+                busqueda->siguiente = aux;
+                busqueda = NULL;
+                
+            }else{
+                busqueda = busqueda->siguiente;
+            }            
+        }        
+    }    
 }
+
 
 /***************************************************************************
     METODOS PARA LA ELIMINACION DE DATOS EN LA LISTA SIMPLE ORDENADA
@@ -47,7 +70,7 @@ void Remove(Nodo<T>* n){
         if (n == First)
         {
             //SI SE ELIMINA EL PRIMER NODO
-            First = First->Siguiente;
+            First = First->siguiente;
         }
         else if (n == Last)
         {
@@ -55,12 +78,12 @@ void Remove(Nodo<T>* n){
             Nodo<T>* busqueda = First;
             while (busqueda != NULL)
             {
-                if (busqueda->Siguiente == Last)
+                if (busqueda->siguiente == Last)
                 {
-                    busqueda->Siguiente = NULL;
+                    busqueda->siguiente = NULL;
                     Last = busqueda;
                 }else{
-                    busqueda = busqueda->Siguiente;
+                    busqueda = busqueda->siguiente;
                 }                
             }
         }
@@ -70,11 +93,11 @@ void Remove(Nodo<T>* n){
             Nodo<T>* busqueda = First;
             while (busqueda != NULL)
             {
-                if (busqueda->Siguiente == n)
+                if (busqueda->siguiente == n)
                 {
-                    busqueda->Siguiente = n->Siguiente;                    
+                    busqueda->siguiente = n->siguiente;                    
                 }else{
-                    busqueda = busqueda->Siguiente;
+                    busqueda = busqueda->siguiente;
                 }                
             }
         }        
@@ -103,7 +126,7 @@ int Size(){
     while (aux != NULL)
     {
         contador++;
-        aux=aux->Siguiente;
+        aux=aux->siguiente;
     }
     return contador;
 }
@@ -117,12 +140,12 @@ Nodo<T>* Find(T* dato){
     Nodo<T>* encontrado=NULL;
     while (aux != NULL)
     {
-        if (aux->Dato == dato)
+        if (aux->dato == dato)
         {
             encontrado = aux;
             aux=NULL;
         }else{
-            aux=aux->Siguiente;
+            aux=aux->siguiente;
         }        
     }
     return encontrado;
@@ -144,49 +167,19 @@ Nodo<T>* Index(int index){
                 aux=NULL;
             }else{
                 contadorIndex++;
-                aux = aux->Siguiente;
+                aux = aux->siguiente;
             }        
         }
     }    
     return encontrado;
 }
-
-//METODO QUE DEVUELVE UN NODO SEGUN: SU POSICION EN EL ESPACIO
-Nodo<T>* GetPosition(int x, int y){
-    Nodo<T>* aux = First;
-    Nodo<T>* encontrado = NULL;
-    while (aux != NULL)
-    {
-        if (aux->X == x && aux->Y == y)
-        {
-            encontrado = aux;
-            aux=NULL;
-        }else{
-            aux=aux->Siguiente;
-        }        
-    }
-    return encontrado;
+//Devuelve el valor en lista mas PEQUEÑO
+Nodo<T>* Min(){
+    return First;
 }
+//Devuelve el valor en lista mas GRANDE
+Nodo<T>* Max(){
+    return Last;
+}  
 
-//METODO QUE DEVUELVE SI UNA POSICION ESTA OCUPADA
-bool Position(int x, int y){
-    Nodo<T>* aux = First;
-    bool encontrado = false;
-    while (aux != NULL)
-    {
-        if (aux->X == x && aux->Y == y)
-        {
-            encontrado = true;
-            aux=NULL;
-        }else{
-            aux=aux->Siguiente;
-        }        
-    }
-    return encontrado;
-}
-
-void Clear(){
-    First = NULL;
-    Last = NULL;
-}
 };

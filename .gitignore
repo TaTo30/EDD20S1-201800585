@@ -50,3 +50,6 @@ Proyecto1/main.ilk
 Proyecto1/main.exe
 *.png
 *.dot
+*.dot
+*.json
+*.pdb

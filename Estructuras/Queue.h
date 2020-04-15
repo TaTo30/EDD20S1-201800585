@@ -7,7 +7,7 @@ template <typename T> class Queue
 {
     template <typename T> struct Nodo
     {
-        T dato;
+        T* dato;
         Nodo* siguiente;
     };
 
@@ -21,9 +21,8 @@ Queue(){
     First = NULL;
     Last = NULL;
 }
-
-//Encolar un dato a la lista enlazanda
-void Enqueue(T dato)
+//Inserta un valor en la cola
+void Enqueue(T* dato)
 {
     Nodo<T>* aux = new Nodo<T>();
     aux->dato = dato;
@@ -38,9 +37,8 @@ void Enqueue(T dato)
         First = aux;
     }    
 }
-
-//Desencolar un dato a la lista enlazada
-Nodo<T>* Dequeue(){
+//Retorna un valor de la cola
+T* Dequeue(){
     Nodo<T>* aux = First;
     Nodo<T>* toReturn = NULL;
     if (First == Last)
@@ -66,10 +64,10 @@ Nodo<T>* Dequeue(){
             }        
         }
     }    
-    return toReturn;
+    return toReturn->dato;
 }
 
-//Metodos Propiedades de la Cola
+//Retorna un valor booleano, true si la cola tiene datos, false si no tiene datos
 bool Contain(){
     bool toReturn = true;
     if (First ==NULL)
@@ -78,7 +76,7 @@ bool Contain(){
     }
     return toReturn;
 }
-
+//Retorna el tamaño de la cola
 int Size(){
     Nodo<T>* aux = First;
     int contador=0;
@@ -88,6 +86,13 @@ int Size(){
         aux=aux->siguiente;
     }
     return contador;
+}
+//Vacia toda la cola
+void Clear(){
+    while (Contain())
+    {
+        delete Dequeue();
+    }    
 }
 
 };

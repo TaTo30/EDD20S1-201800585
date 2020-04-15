@@ -1,6 +1,5 @@
-digraph g{ node [shape = circle];Heidy;
-Heidy->Antonio;
-Heidy->Pegre;
-Antonio->Darken;
-Pegre->TaTo30;
+digraph g{ node [shape = circle];pegre;
+pegre->aldo;
+pegre->ricardo;
+aldo->beto;
 }

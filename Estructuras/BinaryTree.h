@@ -40,7 +40,6 @@ Nodo<T>* AddRecursive(Nodo<T>* raiz, T dato, int key)
     }
     return raiz;
 }
-
 Nodo<T>* RemoveRecursive(Nodo<T>* raiz, int key)
 {
     if (raiz == NULL)
@@ -75,7 +74,6 @@ Nodo<T>* RemoveRecursive(Nodo<T>* raiz, int key)
     }
     return raiz;
 }
-
 int minValue(Nodo<T>* raiz){
     int min = raiz->Key;
     while (raiz->HijoIzquierdo != NULL)
@@ -85,7 +83,6 @@ int minValue(Nodo<T>* raiz){
     }
     return min;    
 }
-
 T MinValueData(Nodo<T>* raiz){
     T dato = raiz->Dato;
     while (raiz->HijoIzquierdo != NULL)
@@ -102,11 +99,11 @@ BinaryTree(){
     Raiz=NULL;
 }
 
-//METODO INSERTAR DATOS
+//Inserta un dato en el arbol binario
 void Add(T dato, int key){
     Raiz = AddRecursive(Raiz,dato,key);
 }
-
+//Elimina un dato en el arbol binario
 void Remove(int key){
     Raiz = RemoveRecursive(Raiz,key);
 }

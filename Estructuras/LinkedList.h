@@ -1,15 +1,11 @@
-#include <iostream>
 #include <stdio.h>
 
 using namespace std;
-
-
-
 template <typename T> class LinkedList
 {   
     template <typename T> struct Nodo
     {   
-        T dato;
+        T* dato;
         Nodo* Anterior;
         Nodo* Siguiente;        
     };
@@ -17,7 +13,7 @@ private:
     Nodo<T>* First;
     Nodo<T>* Last;
     //Metodo privado general para insertar datos
-void Add(Nodo<T>* n, T dato_, bool pos){
+void Add(Nodo<T>* n, T* dato_, bool pos){
     Nodo<T>* aux = new Nodo<T>();
     aux->dato = dato_;    
     if (Verificar() && n == NULL)
@@ -55,77 +51,8 @@ void Add(Nodo<T>* n, T dato_, bool pos){
     }
 }
 
-public:  
-
-LinkedList(){
-    First = NULL;
-    Last = NULL;
-}
-/*************************************************************************
-    METODOS PARA LA INSERSION DE DATOS EN LA LISTA DOBLEMENTE ENLAZADA
-*************************************************************************/
-//Metodo publico para insertar al inicio de la lista
-void AddFirst(T dato){
-    Add(First, dato, true);
-}
-//Metodo publico para insertar al final de la lista
-void AddLast(T dato){
-    Add(Last, dato, false);
-}
-//Metodo publico para insertar antes de un nodo dado (el nodo se obtiene con los metodos de buscar)
-void AddBeforeAt(Nodo<T>* n, T dato){
-    Add(n,dato, true);
-}
-//Metodo publico para insertar despues de un nodo dado (el nodo se obtiene con los metodos de buscar)
-void AddAfterAt(Nodo<T>* n, T dato){
-    Add(n, dato, false);
-}
-
-
-/***************************************************************************
-    METODOS PARA LA ELIMINACION DE DATOS EN LA LISTA DOBLEMENTE ENLAZADA
-***************************************************************************/
-void Remove(Nodo<T>* n){
-    if (!Verificar() || n != NULL)
-    {   
-        if (n == First && n == Last)
-        {
-            //ELIMINA EL ULTIMO NODO: LISTA VACIA
-            First = NULL;
-            Last = NULL;
-        }        
-        else if (n == First)
-        {
-            //ELIMINAR EL PRIMER NODO
-            First = First->Siguiente;
-            First->Anterior = NULL;
-        }
-        else if (n == Last)
-        {
-            //ELIMINAR EL SEGUNDO NODO
-            Last = Last->Anterior;
-            Last->Siguiente = NULL;
-        }
-        else
-        {
-            //ELIMINAR CUALQUIER NODO
-            n->Anterior->Siguiente = n->Siguiente;
-            n->Siguiente->Anterior = n->Anterior;
-        }        
-    }else{
-        cout<<"Error: el nodo no se encuentra en la lista"<<endl;
-    }    
-}
-//Metodo para eliminar uno nodo segun su posicion
-void RemoveAt(int index){
-    Remove(Index(index));
-}
-/***********************************************************************
-    METODOS PARA LA BUSCAR DE DATOS EN LA LISTA DOBLEMENTE ENLAZADA
-            TODOS LOS METODOS DE BUSCAR DEVUELVEN UN NODO
-***********************************************************************/
-//Metodo publico para buscar un nodo SEGUN: su contenido
-Nodo<T>* Find(T dato){
+    //Metodo privado para la ubicacion de nodos por datos
+Nodo<T>* Find(T* dato){
     Nodo<T>* aux = First;
     Nodo<T>* encontrado=NULL;
     while (aux != NULL)
@@ -140,7 +67,8 @@ Nodo<T>* Find(T dato){
     }
     return encontrado;    
 }
-//Metodo publico para buscar un nodo SEGUN: su posicion
+
+    //Metodo privado para la ubicacion de nodos por indicie
 Nodo<T>* Index(int index){
     Nodo<T>* aux = First;
     Nodo<T>* encontrado = NULL;
@@ -163,19 +91,139 @@ Nodo<T>* Index(int index){
     }    
     return encontrado;
 }
-//Metodo publico para buscar un nodo SEGUN: el primero siempre
-Nodo<T>* GetFirst(){
-    return First;
+
+    //Metodo privado general para eliminar datos
+void Remove(Nodo<T>* n){
+    if (!Verificar() || n != NULL)
+    {   
+        if (n == First && n == Last)
+        {
+            //ELIMINA EL ULTIMO NODO: LISTA VACIA
+            First = NULL;
+            Last = NULL;
+            delete n;
+        }        
+        else if (n == First)
+        {
+            //ELIMINAR EL PRIMER NODO
+            First = First->Siguiente;
+            First->Anterior = NULL;
+            delete n;
+        }
+        else if (n == Last)
+        {
+            //ELIMINAR EL SEGUNDO NODO
+            Last = Last->Anterior;
+            Last->Siguiente = NULL;
+            delete n;
+        }
+        else
+        {
+            //ELIMINAR CUALQUIER NODO
+            n->Anterior->Siguiente = n->Siguiente;
+            n->Siguiente->Anterior = n->Anterior;
+            delete n;
+        }        
+    }else{
+        cout<<"Error: el nodo no se encuentra en la lista"<<endl;
+    }    
 }
-//Metodo publico para buscar un nodo SEGUN: el ultimo siempre
-Nodo<T>* GetLast(){
-    return Last;
+public:  
+
+//Constructor de Lista
+LinkedList(){
+    First = NULL;
+    Last = NULL;
 }
+
+/*************************************************************************
+    METODOS PARA LA INSERSION DE DATOS EN LA LISTA DOBLEMENTE ENLAZADA
+*************************************************************************/
+
+//Inserta un valor al inicio de la lista
+void AddFirst(T* data){
+    Add(First, data, true);
+}
+//Inserta un valor al final de la lista
+void AddLast(T* data){
+    Add(Last, data, false);
+}
+//Inserta un valor antes de un valor especificado por el usuario
+void AddBeforeAt(T* reference, T* data){
+    Add(Find(reference),data, true);
+}
+//Inserta un valor despues de un valor especificado por el usuario
+void AddAfterAt(T* reference, T* data){
+    Add(Find(reference), data, false);
+}
+
+
+/***************************************************************************
+    METODOS PARA LA ELIMINACION DE DATOS EN LA LISTA DOBLEMENTE ENLAZADA
+***************************************************************************/
+
+//Eliminar un valor en el indice establecido
+void RemoveAt(int index){
+    Remove(Index(index));
+}
+//Elimina el ultimo valor de la lista
+void RemoveLast(){
+    Remove(Last);
+}
+//Elimina el primer valor de la lista
+void RemoveFirst(){
+    Remove(First);
+}
+//Elimina un valor por elemento especificado por el usuario
+void RemoveElement(T* data){
+    Remove(Find(data));
+}
+
+
+/***********************************************************************
+    METODOS PARA LA BUSCAR DE DATOS EN LA LISTA DOBLEMENTE ENLAZADA
+            TODOS LOS METODOS DE BUSCAR DEVUELVEN UN NODO
+***********************************************************************/
+
+//Devuelve el valor del dato en el indice especificado por el usuario
+T* ElementAt(int index){
+    Nodo<T>* aux = First;
+    Nodo<T>* encontrado = NULL;
+    int contadorIndex = 0;
+    if (index > Size())
+    {
+        cout<<"El indice introducido es mayor a la longitud de la lista"<<endl;
+    }else{
+        while (aux != NULL)
+        {
+            if (contadorIndex == index)
+            {
+                encontrado = aux;
+                aux=NULL;
+            }else{
+                contadorIndex++;
+                aux = aux->Siguiente;
+            }        
+        }
+    }    
+    return encontrado->dato;
+}
+//Devuelve el primer dato de la lista
+T* GetFirst(){
+    return First->dato;
+}
+//Devuelve el ultimo dato de la lista
+T* GetLast(){
+    return Last->dato;
+}
+
+
 /***********************************************************************
     METODOS PARA LA COMPROBACION DE DATOS Y DESPLIEGE EN PANTALLA
 ***********************************************************************/
-//Verifica que la lista este vacia
-bool Verificar(){
+
+//Devuelve un valor bool, true si la lista contiene datos, false si no contiene datos
+bool Contain(){
     if (First == NULL)
     {
         return false;
@@ -184,7 +232,7 @@ bool Verificar(){
     }
     
 }
-//Verifica el tamanio de la lista
+//Devuelve el valor correspondiente al tamaño de la lista
 int Size(){
     Nodo<T>* aux = First;
     int contador=0;
@@ -195,13 +243,15 @@ int Size(){
     }
     return contador;    
 }
-//Imprime todo el contenido de la lista
-void Imprimir(){
-    Nodo<T>* aux= First;
-    while (aux != NULL)
+//Vacia la lista
+void Clear(){    
+    Nodo<T>* aux = First;
+    while (aux!=NULL)
     {
-        cout<<aux->dato;
-        aux=aux->Siguiente;
-    }    
+        Remove(aux);
+        aux = First;
+    }
+    First = NULL;
+    Last = NULL;
 }
 };

@@ -3,6 +3,7 @@
 #include "Estructuras/Queue.h"
 #include "Estructuras/BinaryTree.h"
 #include "Estructuras/Matrix.h"
+#include "Estructuras/OrderListP.h"
 #include "Clases/Jugador.h"
 #include "Paquetes/json.hpp"
 #include <stdio.h>
@@ -268,47 +269,91 @@ void Turno(Jugador* P){
     {
         cout<<"X:"<<CasillasTriples->Index(i)->X<<" Y:"<<CasillasTriples->Index(i)->Y<<" - ";
     }
-    Gotoxy(5,4);cout<<"Casillas Dobles (Posicion)";
-    Gotoxy(5,5);
+    Gotoxy(5,5);cout<<"Casillas Dobles (Posicion)";
+    Gotoxy(5,6);
     for (int i = 0; i < CasillasDobles->Size(); i++)
     {
         cout<<"X:"<<CasillasDobles->Index(i)->X<<" Y:"<<CasillasDobles->Index(i)->Y<<" - ";
     }
-    Gotoxy(5,6);cout<<"Casillas Ocupadas";
-    Gotoxy(5,7);
+    Gotoxy(5,8);cout<<"Casillas Ocupadas";
+    Gotoxy(5,9);
     for (int i = 0; i < Tablero->Size(); i++)
     {
         cout<<"X:"<<Tablero->Index(i)->X<<" Y:"<<Tablero->Index(i)->Y<<" - ";
     }
-    Gotoxy(5,8);cout<<"Dimension del Tablero"<<Dimension;
-    Gotoxy(5,10);cout<<"Fichas de "<<P->GetNombre();
-    Gotoxy(5,11);
+    Gotoxy(5,12);cout<<"Dimension del Tablero"<<Dimension;
+    Gotoxy(5,13);cout<<"Fichas de "<<P->GetNombre();
+    Gotoxy(5,14);
     for (int i = 0; i < P->GetFichasPlayer()->Size(); i++)
     {
         cout<<P->GetFichasPlayer()->Index(i)->dato->GetLetra()<<" ("<<i<<") - ";
     }
-    Gotoxy(5,12);cout<<"Diccionario";
-    Gotoxy(5,13);
+    Gotoxy(5,16);cout<<"Diccionario";
+    Gotoxy(5,17);
     for (int i = 0; i < Diccionario->Size(); i++)
     {
         cout<<Diccionario->Index(i)->dato<<" - ";
     }
-    Gotoxy(5,14);cout<<"PALABRA A FORMAR: ";
+    Gotoxy(5,20);cout<<"PALABRA A FORMAR: ";
     for (int i = 0; i < PalabraTemporal->Size(); i++)
     {
-        cout<<PalabraTemporal->Index(i)->Dato->GetLetra();
+        cout<<PalabraTemporal->Index(i)->Dato->GetLetra()<<"("<<PalabraTemporal->Index(i)->X<<","<<PalabraTemporal->Index(i)->Y<<"), ";
     }
     
     char a;
-    Gotoxy(5,16);cout<<"Pulse V para validar su Turno o E para Terminar la partida";
-    Gotoxy(5,15);cout<<"SELECCIONAR FICHA> ";cin>>a;
+    Gotoxy(5,22);cout<<"Pulse V para validar su Turno o E para Terminar la partida";
+    Gotoxy(5,23);cout<<"SELECCIONAR FICHA> ";cin>>a;
+    //VALIDAR LA PARTIDA
     if (a == 'V')
     {
+        bool Xconstante = false;
+        if (PalabraTemporal->Index(0)->X == PalabraTemporal->Index(1)->X)
+        {
+            Xconstante = true;
+        }
+        bool restriccion=true;
+        if (Xconstante)
+        {
+            int xt = PalabraTemporal->Index(0)->X;
+            for (int i = 0; i < PalabraTemporal->Size(); i++)
+            {
+                if (PalabraTemporal->Index(i)->X != xt)
+                {
+                    restriccion = false;
+                }               
+            }            
+        }else{
+            int yt = PalabraTemporal->Index(0)->Y;
+            for (int i = 0; i < PalabraTemporal->Size(); i++)
+            {
+                if (PalabraTemporal->Index(i)->Y != yt)
+                {
+                    restriccion = false;
+                } 
+            }            
+        }
+        
+        //REORDENAR LA PALABRA PONIENDOLA DENTRO DE UN ORDERLIST
+        OrderListP<Ficha>* PalabraOrdenada = new OrderListP<Ficha>();
+        if (Xconstante)
+        {
+            for (int i = 0; i < PalabraTemporal->Size(); i++)
+            {
+                PalabraOrdenada->Add(PalabraTemporal->Index(i)->Dato,PalabraTemporal->Index(i)->Y);
+            }            
+        }else{
+            for (int i = 0; i < PalabraTemporal->Size(); i++)
+            {
+                PalabraOrdenada->Add(PalabraTemporal->Index(i)->Dato,PalabraTemporal->Index(i)->X);
+            } 
+        }
+        
+
         string palabraFormada="";
         bool Valido=false;
         for (int i = 0; i < PalabraTemporal->Size(); i++)
         {
-            palabraFormada += PalabraTemporal->Index(i)->Dato->GetLetra();
+            palabraFormada += PalabraOrdenada->Index(i)->dato->GetLetra();
         }
         for (int i = 0; i < Diccionario->Size(); i++)
         {
@@ -320,7 +365,7 @@ void Turno(Jugador* P){
         //SI ES VALIDO SUMAR LOS PUNTOS AGREGARLOS AL PUNTEO
         //-VACIAR LA LISTA TEMPORAL
         //INICIAR EL NUEVO TURNO
-        if (Valido)
+        if (Valido && restriccion)
         {
             Gotoxy(5,18);cout<<"Tu Palabra es Valida";
             for (int i = 0; i < PalabraTemporal->Size(); i++)
@@ -403,6 +448,7 @@ void Turno(Jugador* P){
             }
         }
     }
+    //TERMINAR LA PARTIDA
     else if (a == 'E')
     {
         Player1->GetFichasPlayer()->Clear();
@@ -416,17 +462,19 @@ void Turno(Jugador* P){
         system("cls");
         MenuPrincipal();
     }
+    //AÑADIR PALABRA AL DICCIONARIO
     else
     {
         char b;
-        Gotoxy(5,16);cout<<"<1> Agregar Esta Ficha a la Palabra  <2> Intercambiar esta Ficha con la Cola";
-        Gotoxy(5,17);cout<<"SELECT> ";cin>>b;
+        Gotoxy(5,25);cout<<"<1> Agregar Esta Ficha a la Palabra  <2> Intercambiar esta Ficha con la Cola";
+        Gotoxy(5,26);cout<<"SELECT> ";cin>>b;
+        //AGREGAR PALABRA AL PALABRA A FORMAR
         if (b == '1')
         {
             int posx;
             int posy;
-            Gotoxy(5,18);cout<<"POS X> ";cin>>posx;
-            Gotoxy(5,19);cout<<"POS Y> ";cin>>posy;
+            Gotoxy(5,27);cout<<"POS X> ";cin>>posx;
+            Gotoxy(5,28);cout<<"POS Y> ";cin>>posy;
             if (!Tablero->Position(posx,posy))
             {
                 //SI LA POSICION NO ESTA OPCUPADA
@@ -437,6 +485,24 @@ void Turno(Jugador* P){
                     POSY = posy;
                     //AÑADIMOS LA FICHA AL TABLERO
                     Tablero->Add(P->GetFichasPlayer()->Index((int)a-48)->dato,POSX,POSY);
+                    //VERIFICAMOS SI SE JUNTA CON OTRA PALABRA VERIFICANDO 4 LADOS
+                    //Arriba
+                    if (Tablero->Position(POSX,POSY-1))
+                    {
+                        PalabraTemporal->Add(Tablero->GetPosition(POSX, POSY-1)->Dato,POSX, POSY-1);
+                    }//Abajo
+                    else if (Tablero->Position(POSX, POSY+1))
+                    {
+                        PalabraTemporal->Add(Tablero->GetPosition(POSX, POSY+1)->Dato,POSX, POSY+1);
+                    }//Izquierda
+                    else if (Tablero->Position(POSX-1, POSY))
+                    {
+                        PalabraTemporal->Add(Tablero->GetPosition(POSX-1,POSY)->Dato,POSX-1,POSY);
+                    }//Derecha
+                    else if (Tablero->Position(POSX+1,POSY))
+                    {
+                        PalabraTemporal->Add(Tablero->GetPosition(POSX+1,POSY)->Dato,POSX+1,POSY);
+                    }                   
                     PalabraTemporal->Add(P->GetFichasPlayer()->Index((int)a-48)->dato,POSX,POSY);
                     P->GetFichasPlayer()->RemoveAt((int)a-48);
                     P->GetFichasPlayer()->AddLast(Fichas->Dequeue()->dato);
@@ -1033,6 +1099,7 @@ void ModoAbrirArchivoJson(){
     json Triples;
     json Dobles;
     ArchivoConfiguracion >> config;
+    Dimension = config["dimension"];
     for (json::iterator i = config.begin(); i != config.end(); ++i)
     {
         if (i.key() == config.find("diccionario").key())
